@@ -1,9 +1,42 @@
 # Kali-linux-default non-interactive install script for Debian
 # Tested on Debian 9
-# Change Kali and VNC password variables below
 
-kalipass='defaultkalipassword123'
-vncpass='defaultkalipassword123'
+# List of parameters: 
+# -u --kaliuser 
+# -p --kalipass
+# -vp --vncpass 
+
+# Check if user is root or sudo
+if ! [ $( id -u ) = 0 ]; then
+    echo "Please run this script as sudo or root" 1>&2
+    exit 1
+fi
+
+#Initialize variables
+kaliuser=""
+kalipass=""
+vncpass=""
+
+
+# Get script arguments for non-interactive mode
+while [ "$1" != "" ]; do
+    case $1 in
+        # Kali username and password
+        -u | --kaliuser )
+            kaliuser="$1"
+            ;;
+        -p | --kalipass )
+            kalipass="$1"
+            ;;
+
+        # VNC password
+        -vp | --vncpass )
+            shift
+            vncpass="$1"
+            ;;
+    esac
+    shift
+done
 
 # Set Locales
 echo "Setting locales"
@@ -29,9 +62,9 @@ echo deb-src http://http.kali.org/kali kali-rolling main contrib non-free >> /et
 
 # Set non-interactive
 echo "Set noninteractive install"
-DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive
 
-# Preset configurations (for kali-linux-full and xfce)
+# Preset configurations (for kali-linux-default and xfce)
 echo "Setting preset configurations"
 echo libc6/libraries libc6/libraries/restart-without-asking boolean true | debconf-set-selections
 echo libc6 libraries/restart-without-asking boolean true | debconf-set-selections
@@ -72,13 +105,15 @@ apt-get -y upgrade
 
 # Dist-upgrade 
 echo "Apt dist-upgrade"
-apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
+#apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
+TERM=linux DEBIAN_FRONTEND=noninteractive apt-get -yq -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
+
 echo "Apt autoremove"
 apt-get -y autoremove
 
 # Add Kali user with default password
 echo "Adding kali user"
-useradd kali -m -p $kalipass
+useradd $kaliuser -m -p $kalipass
 usermod -a -G sudo kali
 chsh -s /bin/bash kali
 
