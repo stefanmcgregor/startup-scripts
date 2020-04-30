@@ -6,6 +6,7 @@ kalipass='defaultkalipassword123'
 vncpass='defaultkalipassword123'
 
 # Set Locales
+echo "Setting locales"
 locale-gen en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -14,27 +15,24 @@ locale-gen en_US.UTF-8
 dpkg-reconfigure locales --default-priority
 
 # Ensure dependency
+echo "Installing dirmngr"
 apt-get -y install dirmngr
 
 # Add Kali repo key to apt
+echo "Adding Kali repo key to apt"
 apt-key adv --keyserver hkp://keys.gnupg.net --recv-keys 7D8D0BF6
 
 # Add Kali repos to source list
+echo "Adding kali sources"
 echo deb http://http.kali.org/kali kali-rolling main contrib non-free >> /etc/apt/sources.list
 echo deb-src http://http.kali.org/kali kali-rolling main contrib non-free >> /etc/apt/sources.list
 
-# Set Locales
-locale-gen en_US.UTF-8
-export LANGUAGE=en_US.UTF-8
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-locale-gen en_US.UTF-8
-dpkg-reconfigure locales --default-priority
-
 # Set non-interactive
+echo "Set noninteractive install"
 DEBIAN_FRONTEND=noninteractive
 
 # Preset configurations (for kali-linux-full and xfce)
+echo "Setting preset configurations"
 echo libc6/libraries libc6/libraries/restart-without-asking boolean true | debconf-set-selections
 echo libc6 libraries/restart-without-asking boolean true | debconf-set-selections
 echo libc6:amd64 libraries/restart-without-asking boolean true | debconf-set-selections
@@ -52,30 +50,40 @@ echo ucf ucf/changeprompt_threeway select keep_current | debconf-set-selections
 
 
 # Get latest information from the repos
+echo "Apt update"
 apt-get -y update
 
 # Install desktop environment
-apt-get -y install kali-desktop-xfce 
+echo "Install kali-desktop-xfce"
+apt-get -y install kali-desktop-xfce
+echo "Apt update"
 apt-get -y update
 
 
 # Install Kali meta-package
+echo "Apt install kali-linux-default"
 apt-get -y install kali-linux-default        # The Default Kali Linux Install (meant to save space)
 
 # Upgrade old packages to the latest
+echo "Apt update"
 apt-get -y update
+echo "Apt upgrade"
 apt-get -y upgrade
 
 # Dist-upgrade 
-apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
+echo "Apt dist-upgrade"
+apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
+echo "Apt autoremove"
 apt-get -y autoremove
 
 # Add Kali user with default password
+echo "Adding kali user"
 useradd kali -m -p $kalipass
 usermod -a -G sudo kali
 chsh -s /bin/bash kali
 
 # Install and setup X11VNC
+echo "Installing X11VNC"
 apt-get install x11vnc -y
 
 # Specify password to be used for VNC Connection 
@@ -94,11 +102,12 @@ ExecStart=/usr/bin/x11vnc -auth guess -forever -loop -noxdamage -repeat -rfbauth
 [Install]
 WantedBy=multi-user.target
 EOF
- 
+
 systemctl enable x11vnc.service
 systemctl daemon-reload
 
 #Update the databases
+echo "Update the databases"
 updatedb
 mandb
 
