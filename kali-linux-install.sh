@@ -1,10 +1,16 @@
 # Kali-linux-default non-interactive install script for Debian
 # Tested on Debian 9
+# Installs, configures and automatically starts VNCServer on port 65520. Please add a VNC password to login.
+# You will need to install VNCClient on your machine to login the Kali Linux system or setup Guacamole to login via VNCClient.
+
+
+# Kali user is having issues, I believe I fixed it but please use root user login instead if it is not working
+
 
 # List of parameters: 
-# -u --kaliuser 
-# -p --kalipass
-# -vp --vncpass 
+# -u --kaliuser - Username for kali linux to create
+# -p --kalipass - Password for the kali user
+# -vp --vncpass - VNC Server password
 
 # Check if user is root or sudo
 if ! [ $( id -u ) = 0 ]; then
