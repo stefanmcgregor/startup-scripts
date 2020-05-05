@@ -111,12 +111,6 @@ TERM=linux DEBIAN_FRONTEND=noninteractive apt-get -yq -o Dpkg::Options::="--forc
 echo "Apt autoremove"
 apt-get -y autoremove
 
-# Add Kali user with default password
-echo "Adding kali user"
-useradd $kaliuser -m -p $kalipass
-usermod -a -G sudo kali
-chsh -s /bin/bash kali
-
 # Install and setup X11VNC
 echo "Installing X11VNC"
 apt-get install x11vnc -y
@@ -140,6 +134,12 @@ EOF
 
 systemctl enable x11vnc.service
 systemctl daemon-reload
+
+# Add Kali user with default password
+echo "Adding kali user"
+useradd $kaliuser -m -p $kalipass
+usermod -a -G sudo kali
+chsh -s /bin/bash kali
 
 #Update the databases
 echo "Update the databases"
